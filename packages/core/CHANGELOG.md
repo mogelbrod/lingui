@@ -11,7 +11,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 **Note:** Version bump only for package @lingui/core
 
-## [5.9.3](https://github.com/lingui/js-lingui/compare/v6.0.0-next.1...v5.9.3) (2026-03-13)
+## [5.9.3](https://github.com/lingui/js-lingui/compare/v5.9.2...v5.9.3) (2026-03-13)
 
 **Note:** Version bump only for package @lingui/core
 
