@@ -368,7 +368,7 @@ const message = t({
 
 ### `defineMessage` / `msg` {#definemessage}
 
-The `defineMessage` (alias: `msg`) macro allows to define a message for later use. It has the same signature as `t` and returns a `MessageDescriptor` that you can pass to `i18n._` to get a translated string at any time later. This is useful for [Lazy Translations](/guides/lazy-translations).
+The `defineMessage` (alias: `msg`) macro allows to define a message for later use. It has the same signature as `t` and returns a `MessageDescriptor` that you can pass to `i18n.t` to get a translated string at any time later. This is useful for [Lazy Translations](/guides/lazy-translations).
 
 In other words, `t` returns a translated string at the time when it's called, while `msg` returns a `MessageDescriptor` that can produce translated strings later:
 
@@ -380,7 +380,7 @@ import { defineMessage } from "@lingui/core/macro";
 const message = defineMessage`Hello World`;
 
 // use it later
-i18n._(message);
+i18n.t(message);
 
 // ↓ ↓ ↓ ↓ ↓ ↓
 
@@ -392,7 +392,7 @@ const message = /*i18n*/ {
 };
 
 // use it later
-i18n._(message);
+i18n.t(message);
 ```
 
 You can also use a shorter alias of the `defineMessage` macro:
@@ -498,6 +498,163 @@ const message = /*i18n*/ {
 `message` and `comment` are used in message catalogs only. `context` is used only for generating ID and is stripped from the output.
 
 :::
+
+### `ph`
+
+The `ph` macro is used to provide explicit labels for placeholders. By default, only simple variables are referenced by name in transformed messages. Complex expressions (like function calls) are referenced by numeric index (`{0}`, `{1}`), which provides little context for translators.
+
+The `ph` macro solves this by letting you assign meaningful names to any expression:
+
+```js
+import { t, ph } from "@lingui/core/macro";
+
+// Without ph(): "Hello {0}"
+t`Hello ${getUserName()}`;
+
+// With ph(): "Hello {name}"
+t`Hello ${ph({ name: getUserName() })}`;
+```
+
+It works by taking an object with a single property, where the key becomes the placeholder name and the value is the expression:
+
+```js
+import { t, ph } from "@lingui/core/macro";
+const message = t`Hello ${ph({ name: getUserName() })}`;
+
+// ↓ ↓ ↓ ↓ ↓ ↓
+
+import { i18n } from "@lingui/core";
+const message = i18n._(
+  /*i18n*/ {
+    id: "OUzSsf",
+    message: "Hello {name}",
+    values: { name: getUserName() },
+  }
+);
+```
+
+The `ph` macro can be used with any other macro that accepts expressions, including [`plural`](#plural), [`select`](#select), and JSX macros like [`Trans`](#trans):
+
+```jsx
+import { Trans } from "@lingui/react/macro";
+import { ph } from "@lingui/core/macro";
+
+<Trans>Welcome back, {ph({ username: getUser().name })}!</Trans>;
+
+// ↓ ↓ ↓ ↓ ↓ ↓
+
+import { Trans } from "@lingui/react";
+<Trans id={"Z5GF+g"} message="Welcome back, {username}!" values={{ username: getUser().name }} />;
+```
+
+### `lingui-set` / `lingui-reset` Comment Directives {#lingui-directive}
+
+Instead of passing `context` and/or `comment` to every macro call, you can use the `lingui-set` and `lingui-reset` comment directives to set these values for all subsequent macros in the same file (or until the next directive resets/overrides them).
+
+- **`lingui-set`**: Sets the specified parameters for all subsequent macros. Requires at least one parameter.
+- **`lingui-reset`**: Clears all previously set parameters. Also accepts new parameters to set like `lingui-set`.
+
+The directive is placed in a comment directly above (or anywhere before) the macro calls it should affect:
+
+```js
+import { t } from "@lingui/core/macro";
+
+// lingui-set context="homepage"
+const msg1 = t`Welcome`;
+const msg2 = t`Sign up`;
+```
+
+Both `msg1` and `msg2` will have `context` set to `"homepage"`.
+
+#### Supported Params
+
+| Param      | Example                     | Description                                                                                                                                                                 |
+| ---------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `context`  | `context="homepage"`        | Sets the [context](/guides/explicit-vs-generated-ids#context) for ID generation                                                                                             |
+| `comment`  | `comment="translator note"` | Sets the [comment](#comment) for translators                                                                                                                                |
+| `idPrefix` | `idPrefix="module."`        | Prefixes explicit `id` values (does not affect generated IDs). If `macro.idPrefixLeader` is specified in the lingui config, only IDs starting with the leader are prefixed. |
+
+#### Syntax
+
+Both line comments and block comments are supported:
+
+```js
+// lingui-set context="homepage"
+/* lingui-set context="homepage" comment="note" */
+// lingui-reset
+/* lingui-reset context="new context" */
+```
+
+Params use the `key="value"` syntax. Values must be wrapped in double quotes.
+
+#### Merging and Scoping
+
+Directives are **file-scoped**. Each directive merges its values with values from previous directives. This allows you to set a base context at the top of a file and add or override specific values later:
+
+```js
+import { t } from "@lingui/core/macro";
+
+// lingui-set context="settings" comment="Settings page"
+const msg1 = t`Save`;
+
+// lingui-set comment="Updated note"
+const msg2 = t`Cancel`; // context="settings", comment="Updated note"
+```
+
+#### Unsetting a Value
+
+Setting a param to an empty string unsets that specific value, without affecting other inherited values:
+
+```js
+import { t } from "@lingui/core/macro";
+
+// lingui-set context="settings" comment="note"
+const msg1 = t`Save`; // context="settings", comment="note"
+
+// lingui-set context=""
+const msg2 = t`Cancel`; // comment="note" (context is removed)
+```
+
+#### Resetting Prior Values
+
+The `lingui-reset` directive clears **all** inherited values. You can combine it with new values to immediately set a new context:
+
+```js
+import { t } from "@lingui/core/macro";
+
+// lingui-set context="settings" comment="note"
+const msg1 = t`Save`;
+
+// lingui-reset
+const msg2 = t`Cancel`; // no context & no comment
+
+// lingui-reset context="new section"
+const msg3 = t`Delete`; // context="new section"
+```
+
+#### Explicit Values Override Directives
+
+Values passed directly to a macro always take precedence over directive values:
+
+```js
+import { t } from "@lingui/core/macro";
+
+// lingui-set context="directive ctx"
+const msg = t({ message: "Hello", context: "explicit ctx" });
+// → context will be "explicit ctx"
+```
+
+#### Usage with React (JSX) Macros
+
+The directive works with React macros too:
+
+```jsx
+import { Trans } from "@lingui/react/macro";
+
+{/* lingui-set idPrefix="homepage." context="homepage" */}
+<Trans>Welcome</Trans>
+<Trans id="copyright">Copyright</Trans>
+```
 
 ## React Macros
 
@@ -783,7 +940,7 @@ import { msg } from "@lingui/core/macro";
 import { useLingui } from "@lingui/react/macro";
 
 export function showAlert(i18n) {
-  alert(i18n._(msg`...`));
+  alert(i18n.t(msg`...`));
 }
 
 function MyComponent() {

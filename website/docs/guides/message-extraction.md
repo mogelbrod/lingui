@@ -54,8 +54,8 @@ The extractor only matches calls by name. It doesn't check if they are really im
 For example:
 
 ```ts
-i18n._("message.id");
-i18n._({ id: "message.id" });
+i18n.t("message.id");
+i18n.t({ id: "message.id" });
 
 ctx.i18n._("message.id");
 ctx.i18n.t("message.id");
@@ -69,10 +69,26 @@ To ignore a specific call expression during extraction, you can add a `lingui-ex
 
 ```ts
 /* lingui-extract-ignore */
-ctx.i18n._("Message");
+ctx.i18n.t("Message");
 ```
 
 Messages marked with this comment will be excluded from extraction.
+
+### `lingui-set` Comment Directive
+
+You can use the `lingui-set` comment directive to set `context` and/or `comment` for subsequent macro calls without passing them to every call:
+
+```ts
+import { t } from "@lingui/core/macro";
+
+// lingui-set context="settings" comment="Settings page"
+const msg1 = t`Save`;
+const msg2 = t`Cancel`;
+```
+
+Both messages will be extracted with `context="settings"` and `comment="Settings page"`. The directive values persist for all subsequent macros until overridden by another directive or cleared with `lingui-reset`.
+
+See [`lingui-set` Comment Directive](/ref/macro#lingui-directive) in the Macros reference for full details and examples.
 
 ### Explicitly Marking Messages
 
@@ -94,10 +110,10 @@ This means that in order for a message to be extracted, it must be defined direc
 ```ts
 // ❌ This message will not be extracted
 const message = "Message";
-i18n._(message);
+i18n.t(message);
 
 // ✅ This message will be extracted
-i18n._("Message");
+i18n.t("Message");
 ```
 
 ## Defining Sources for Analyzing

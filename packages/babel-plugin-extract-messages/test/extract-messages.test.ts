@@ -47,7 +47,7 @@ const transformCode = (
         [
           linguiMacroPlugin,
           {
-            extract: true,
+            descriptorFields: "all",
           } satisfies LinguiPluginOpts,
         ],
         [plugin, pluginOpts],
@@ -252,6 +252,18 @@ import { Trans } from "@lingui/react";
       expectNoConsole(() => {
         const messages = transformCode(code)
         expect(messages.length).toBe(1)
+      })
+    })
+
+    it("Should handle descriptors with object spreads", () => {
+      const code = `
+      const spread = {};
+      i18n.t({ ...spread, id: "x", message: "translation" });
+      `
+      expectNoConsole(() => {
+        const messages = transformCode(code)
+        expect(messages).toHaveLength(1)
+        expect(messages[0]).toMatchObject({ id: "x", message: "translation" })
       })
     })
   })

@@ -13,6 +13,11 @@ const sidebar = [
         label: "Installation and Setup",
         id: "installation",
       },
+      {
+        type: "doc",
+        label: "i18n with AI",
+        id: "ai-tools",
+      },
     ],
   },
   {
@@ -155,6 +160,11 @@ const sidebar = [
         type: "category",
         label: "Advanced",
         items: [
+          {
+            type: "doc",
+            label: "Typed Message IDs",
+            id: "guides/typed-message-ids",
+          },
           {
             type: "doc",
             label: "Custom Extractor",
