@@ -105,8 +105,17 @@ macroTester({
       name: "Variables with `as` type casting",
       code: `
         import { t } from '@lingui/core/macro';
-     
+
         t\`Variable \${{name} as any}\`;
+    `,
+    },
+    {
+      useTypescriptPreset: true,
+      name: "Variables with non-null assertion get a named placeholder (parity with `as`)",
+      code: `
+        import { t } from '@lingui/core/macro';
+
+        t\`Variable \${name!}\`;
     `,
     },
     {
@@ -191,9 +200,9 @@ macroTester({
       `,
     },
     {
-      name: "stripMessageField option - message prop is removed if stripMessageField: true",
+      name: "descriptorFields: id-only - message prop is removed",
       macroOpts: {
-        stripMessageField: true,
+        descriptorFields: "id-only",
       },
       code: `
           import { t } from '@lingui/core/macro'
@@ -249,10 +258,10 @@ macroTester({
     `,
     },
     {
-      name: "Production - message prop is kept if stripMessageField: false",
+      name: "Production - message and context kept with descriptorFields: message",
       production: true,
       macroOpts: {
-        stripMessageField: false,
+        descriptorFields: "message",
       },
       code: `
           import { t } from '@lingui/core/macro';
@@ -265,10 +274,10 @@ macroTester({
       `,
     },
     {
-      name: "Production - all props kept if extract: true",
+      name: "Production - all props kept with descriptorFields: all",
       production: true,
       macroOpts: {
-        extract: true,
+        descriptorFields: "all",
       },
       code: `
         import { t } from '@lingui/core/macro';
@@ -288,11 +297,38 @@ macroTester({
       filename: "js-t-var/js-t-var.js",
     },
     {
-      name: "Support t in t",
+      name: "Support nested msg in t",
+      code: `
+        import { t, msg } from '@lingui/core/macro'
+        t\`Field \${msg\`First Name\`} is required\`
+      `,
+    },
+    {
+      name: "Support nested t in t",
       code: `
         import { t } from '@lingui/core/macro'
-        t\`Field \${t\`First Name\`} is required\`
+        t\`Outer \${t\`Inner \${name}\`} end\`
       `,
+    },
+    {
+      name: "Support nested msg in t message description",
+      code: `
+        import { t, msg } from '@lingui/core/macro';
+        
+        t({
+            message: msg\`Hello \${name}\`,
+        })
+    `,
+    },
+    {
+      name: "Support nested t in t message description",
+      code: `
+        import { t, msg } from '@lingui/core/macro';
+        
+        t({
+            message: t\`Hello \${name}\`,
+        })
+    `,
     },
     {
       name: "should correctly process nested macro when referenced from different imports",

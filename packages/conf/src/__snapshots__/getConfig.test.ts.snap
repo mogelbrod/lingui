@@ -36,7 +36,7 @@ exports[`getConfig > default config and snapshots > should return default config
     ],
   },
   "orderBy": "message",
-  "pseudoLocale": "",
+  "pseudoLocale": [],
   "resolvedConfigPath": StringContaining ".linguirc",
   "rootDir": ".",
   "runtimeConfigModule": {

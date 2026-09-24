@@ -178,7 +178,7 @@ if (import.meta.main) {
     )
     .option(
       "--workers <n>",
-      "Number of worker threads to use (default: CPU count - 1, capped at 8). Pass `--workers 1` to disable worker threads and run everything in a single process",
+      "Number of worker threads to use (default: CPU count - 1, capped at 8; on 1-2 core machines, all cores). Pass `--workers 1` to disable worker threads and run everything in a single process",
     )
     .option("--overwrite", "Overwrite translations for source locale")
     .option("--clean", "Remove obsolete translations")
@@ -188,6 +188,10 @@ if (import.meta.main) {
     )
     .option("--verbose", "Verbose output")
     .option("--watch", "Enables Watch Mode")
+    .argument(
+      "[files...]",
+      "Filter source paths to extract messages only from specific files",
+    )
     .parse(process.argv)
 
   const options = program.opts<CliArgs>()

@@ -63,6 +63,17 @@ export type CatalogProps = {
   format: FormatterWrapper
 }
 
+type CatalogGlobPatterns = {
+  path: string
+  include: Array<string>
+  exclude: Array<string>
+}
+
+type CatalogPattern = {
+  value: string
+  glob: string
+}
+
 export class Catalog {
   name?: string
   path: string
@@ -70,15 +81,26 @@ export class Catalog {
   exclude: Array<string>
   format: FormatterWrapper
   templateFile: string
+  #includePatterns: Array<CatalogPattern>
+  #excludePatterns: Array<CatalogPattern>
 
   constructor(
     { name, path, include, templatePath, format, exclude = [] }: CatalogProps,
     public config: LinguiConfigNormalized,
+    globPatterns: CatalogGlobPatterns = { path, include, exclude },
   ) {
     this.name = name
     this.path = normalizeRelativePath(path)
     this.include = include.map(normalizeRelativePath)
     this.exclude = [this.localeDir, ...exclude.map(normalizeRelativePath)]
+    this.#includePatterns = createCatalogPatterns(
+      this.include,
+      globPatterns.include.map(normalizeRelativePath),
+    )
+    this.#excludePatterns = createCatalogPatterns(this.exclude, [
+      getLocaleDir(normalizeRelativePath(globPatterns.path)),
+      ...globPatterns.exclude.map(normalizeRelativePath),
+    ])
     this.format = format
     this.templateFile =
       templatePath ||
@@ -255,8 +277,18 @@ export class Catalog {
     return await this.format.read(this.templateFile, undefined)
   }
 
+  /** @internal */
+  get sourcePatterns() {
+    return {
+      include: resolveCatalogPatterns(this.include, this.#includePatterns),
+      exclude: resolveCatalogPatterns(this.exclude, this.#excludePatterns),
+    }
+  }
+
   get sourcePaths() {
-    const includeGlobs = this.include.map((includePath) => {
+    const sourcePatterns = this.sourcePatterns
+    const includeGlobs = this.include.map((includePath, index) => {
+      const includeGlob = sourcePatterns.include[index]!
       const isDir = isDirectory(includePath)
       /**
        * glob library results from absolute patterns such as /foo/* are mounted onto the root setting using path.join.
@@ -266,27 +298,48 @@ export class Catalog {
         ? normalize(
             path.resolve(
               process.cwd(),
-              includePath === "/" ? "" : includePath,
+              includePath === "/" ? "" : includeGlob,
               "**/*.*",
             ),
           )
-        : includePath
+        : includeGlob
     })
 
-    return globSync(includeGlobs, { exclude: this.exclude })
+    return globSync(includeGlobs, { exclude: sourcePatterns.exclude })
   }
 
   get localeDir() {
-    const localePatternIndex = this.path.indexOf(LOCALE)
-    if (localePatternIndex === -1) {
-      throw Error(`Invalid catalog path: ${LOCALE} variable is missing`)
-    }
-    return this.path.substring(0, localePatternIndex)
+    return getLocaleDir(this.path)
   }
 
   get locales() {
     return this.config.locales
   }
+}
+
+function createCatalogPatterns(values: Array<string>, globs: Array<string>) {
+  return values.map((value, index) => ({
+    value,
+    glob: globs[index] ?? value,
+  }))
+}
+
+function resolveCatalogPatterns(
+  values: Array<string>,
+  patterns: Array<CatalogPattern>,
+) {
+  return values.map((value, index) => {
+    const pattern = patterns[index]
+    return pattern?.value === value ? pattern.glob : value
+  })
+}
+
+function getLocaleDir(catalogPath: string) {
+  const localePatternIndex = catalogPath.indexOf(LOCALE)
+  if (localePatternIndex === -1) {
+    throw Error(`Invalid catalog path: ${LOCALE} variable is missing`)
+  }
+  return catalogPath.substring(0, localePatternIndex)
 }
 
 function getTemplatePath(ext: string, path: string) {
@@ -321,12 +374,16 @@ export function order<T extends CatalogType>(by: OrderBy, catalog: T): T {
       return acc
     }, {} as T)
 }
+// hardcoded en-US locale to have consistent sorting
+// @see https://github.com/lingui/js-lingui/pull/1808
+const collator = new Intl.Collator("en-US")
+
 /**
  * Object keys are in the same order as they were created
  * https://stackoverflow.com/a/31102605/1535540
  */
 const orderByMessageId: OrderByFn = (a, b) => {
-  return a.messageId.localeCompare(b.messageId)
+  return collator.compare(a.messageId, b.messageId)
 }
 
 const orderByOrigin: OrderByFn = (a, b) => {
@@ -378,10 +435,6 @@ export async function writeCompiled(
   await writeFile(filename, compiledCatalog)
   return filename
 }
-
-// hardcoded en-US locale to have consistent sorting
-// @see https://github.com/lingui/js-lingui/pull/1808
-const collator = new Intl.Collator("en-US")
 
 export const orderByMessage: OrderByFn = (a, b) => {
   const aMsg = a.entry.message || ""

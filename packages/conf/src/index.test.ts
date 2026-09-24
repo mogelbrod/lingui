@@ -60,6 +60,17 @@ describe("@lingui/conf", () => {
     })
   })
 
+  it("should accept a custom `orderBy` function", () => {
+    mockConsole((console) => {
+      const orderBy = () => 0
+      const config = makeConfig({ locales: ["en"], orderBy })
+
+      expect(config.orderBy).toBe(orderBy)
+      expect(console.warn).not.toBeCalled()
+      expect(console.error).not.toBeCalled()
+    })
+  })
+
   it("should validate `format` and throw error if old string format passed (remove in v7)", () => {
     expect(() =>
       makeConfig({
@@ -69,9 +80,9 @@ describe("@lingui/conf", () => {
       }),
     ).toThrowErrorMatchingInlineSnapshot(`
       [Error: String formats like \`{format: po}\` are no longer supported.
-            
+
       Formatters must now be installed as separate packages and provided via format in lingui config:
-              
+
       import { formatter } from "@lingui/format-po"
 
       export default {
@@ -107,6 +118,74 @@ describe("@lingui/conf", () => {
         ),
       })
       expect(config.locales).toEqual(["pl"])
+    })
+  })
+
+  describe("normalize pseudoLocale", () => {
+    it("defaults to an empty array", () => {
+      const config = makeConfig({ locales: ["en"] })
+      expect(config.pseudoLocale).toEqual([])
+    })
+
+    it("handles empty string", () => {
+      const config = makeConfig({ locales: ["en"], pseudoLocale: "" })
+      expect(config.pseudoLocale).toEqual([])
+    })
+
+    it("handles empty array", () => {
+      const config = makeConfig({ locales: ["en"], pseudoLocale: [] })
+      expect(config.pseudoLocale).toEqual([])
+    })
+
+    it("expands the string form into array with empty options", () => {
+      const config = makeConfig({ locales: ["en"], pseudoLocale: "pseudo" })
+      expect(config.pseudoLocale).toEqual([{ locale: "pseudo", options: {} }])
+    })
+
+    it("splits the object form into array with options", () => {
+      const config = makeConfig({
+        locales: ["en"],
+        pseudoLocale: {
+          locale: "pseudo",
+          prepend: "⟦ ",
+          append: " ⟧",
+          extend: 0.4,
+        },
+      })
+      expect(config.pseudoLocale).toEqual([
+        {
+          locale: "pseudo",
+          options: { prepend: "⟦ ", append: " ⟧", extend: 0.4 },
+        },
+      ])
+    })
+
+    it("normalizes an array of pseudolocale objects", () => {
+      const config = makeConfig({
+        locales: ["en", "ar"],
+        pseudoLocale: [
+          {
+            locale: "en-pseudo",
+            prepend: "⟦ ",
+            append: " ⟧",
+            extend: 0.4,
+          },
+          {
+            locale: "ar-pseudo",
+            rightToLeft: true,
+          },
+        ],
+      })
+      expect(config.pseudoLocale).toEqual([
+        {
+          locale: "en-pseudo",
+          options: { prepend: "⟦ ", append: " ⟧", extend: 0.4 },
+        },
+        {
+          locale: "ar-pseudo",
+          options: { rightToLeft: true },
+        },
+      ])
     })
   })
 

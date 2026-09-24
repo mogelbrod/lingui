@@ -22,7 +22,7 @@ import { createBabelExtractor } from "./extractors/babel.js"
 
 export const fixture = (...dirs: string[]) =>
   (
-    path.resolve(__dirname, path.join("fixtures", ...dirs)) +
+    path.resolve(import.meta.dirname, path.join("fixtures", ...dirs)) +
     // preserve trailing slash
     (dirs.at(-1)!.endsWith("/") ? "/" : "")
   ).replace(/\\/g, "/")
@@ -30,7 +30,7 @@ export const fixture = (...dirs: string[]) =>
 function mockConfig(config: Partial<LinguiConfig> = {}) {
   return makeConfig(
     {
-      rootDir: path.join(__dirname, "fixtures"),
+      rootDir: path.join(import.meta.dirname, "fixtures"),
       locales: ["en", "pl"],
       ...config,
     },
@@ -47,6 +47,34 @@ describe("Catalog", () => {
 
   afterEach(() => {
     mockFs.restore()
+  })
+
+  describe("sourcePaths", () => {
+    it("should use current include and exclude patterns", () => {
+      const catalog = new Catalog(
+        {
+          name: "messages",
+          path: "locales/{locale}",
+          include: [fixture("collect/componentA/")],
+          exclude: [],
+          format,
+        },
+        mockConfig(),
+      )
+
+      expect(
+        catalog.sourcePaths.map((file) => path.basename(file)).sort(),
+      ).toEqual(["componentA.js", "index.js"])
+
+      const replacement = fixture("collect/componentB.js")
+      catalog.include = [replacement]
+      expect(catalog.sourcePaths.map((file) => path.basename(file))).toEqual([
+        "componentB.js",
+      ])
+
+      catalog.exclude.push(replacement)
+      expect(catalog.sourcePaths).toEqual([])
+    })
   })
 
   describe("make", () => {
@@ -156,7 +184,7 @@ describe("Catalog", () => {
         {
           name: "messages",
           path: path.resolve(
-            __dirname,
+            import.meta.dirname,
             path.join("fixtures", "pot-template", "{locale}"),
           ),
           include: [],
@@ -537,7 +565,7 @@ describe("Catalog", () => {
       mockFs({
         en: {
           "messages.po": fs.readFileSync(
-            path.resolve(__dirname, "fixtures/messages.po"),
+            path.resolve(import.meta.dirname, "fixtures/messages.po"),
           ),
         },
       })
@@ -564,7 +592,7 @@ describe("Catalog", () => {
         {
           name: "messages",
           path: path.resolve(
-            __dirname,
+            import.meta.dirname,
             path.join("fixtures", "readAll", "{locale}", "messages"),
           ),
           include: [],
@@ -621,6 +649,25 @@ describe("order", () => {
 
     // Jest snapshot order the keys automatically, so test that the key order explicitly
     expect(Object.keys(orderedCatalogs)).toMatchSnapshot()
+  })
+
+  it("should not depend on String.localeCompare when ordering message ids", () => {
+    const localeCompare = vi
+      .spyOn(String.prototype, "localeCompare")
+      .mockImplementation(() => {
+        throw new Error("host-locale-dependent comparison")
+      })
+    const catalog = {
+      z: makeNextMessage({ translation: "Z" }),
+      a: makeNextMessage({ translation: "A" }),
+    }
+
+    try {
+      expect(Object.keys(order("messageId", catalog))).toEqual(["a", "z"])
+      expect(localeCompare).not.toHaveBeenCalled()
+    } finally {
+      localeCompare.mockRestore()
+    }
   })
 
   it("should order messages by origin", () => {

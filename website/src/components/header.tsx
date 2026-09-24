@@ -1,30 +1,13 @@
 import React from "react";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
-import Head from "@docusaurus/Head";
 import { Button } from "./ui/button";
 
 export function Header(): React.ReactElement {
   const { siteConfig = { url: "", title: "", tagline: "" } } = useDocusaurusContext();
-  const ogImage = `${siteConfig.url}/img/og-image.png`;
 
   return (
     <header className="relative px-4 text-center sm:px-8">
-      <Head>
-        <title>{siteConfig.title}</title>
-        <meta property="og:image" content={ogImage} />
-        <meta property="og:title" content={siteConfig.title} />
-        <meta property="og:description" content={siteConfig.tagline} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-
-        <meta name="description" content={siteConfig.tagline} />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={siteConfig.title} />
-        <meta name="twitter:description" content={siteConfig.tagline} />
-        <meta name="twitter:image" content={ogImage} />
-      </Head>
-
       <div className="relative bottom-0 flex overflow-hidden rounded-b-3xl bg-gradient-to-b from-transparent to-red-500/5 p-0">
         <img
           src="/img/header/left-bg.svg"
@@ -48,12 +31,13 @@ export function Header(): React.ReactElement {
             alt="Lingui"
           />
           <h1 className="mb-4 text-3xl font-bold sm:text-5xl">{siteConfig.tagline}</h1>
-          <p className="mb-8 text-base leading-relaxed text-body-fg">
-            JavaScript library for internationalization (i18n) of JavaScript projects. Supports React (including RSC and
-            React Native), Vue, Node.js, and more.
+          <p className="mb-8 text-balance text-base leading-relaxed text-body-fg">
+            Lingui is a lightweight, open-source internationalization (i18n) library for JavaScript and TypeScript. It
+            brings compile-time macros and a CLI for message extraction to React, React Native, Vue, SolidJS, Astro,
+            Svelte, and Node.js.
           </p>
 
-          <div className="my-6 flex flex-wrap items-center justify-center gap-3">
+          <div className="my-6 flex flex-wrap items-center justify-center gap-4">
             <Button href={useBaseUrl("/introduction")}>Get Started</Button>
             <Button href={useBaseUrl("/examples")} isOutline={true}>
               Examples

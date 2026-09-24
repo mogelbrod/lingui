@@ -3,6 +3,85 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.8.0](https://github.com/lingui/js-lingui/compare/v6.7.0...v6.8.0) (2026-09-23)
+
+### Bug Fixes
+
+* **babel-plugin-lingui-macro:** restore `@babel/types` as a runtime dependency ([#2634](https://github.com/lingui/js-lingui/issues/2634)) ([db5f57c](https://github.com/lingui/js-lingui/commit/db5f57c8aa1f2895359ad74aee91791e74436d17))
+
+# [6.7.0](https://github.com/lingui/js-lingui/compare/v6.6.0...v6.7.0) (2026-09-11)
+
+**Note:** Version bump only for package @lingui/babel-plugin-lingui-macro
+
+# [6.6.0](https://github.com/lingui/js-lingui/compare/v6.5.0...v6.6.0) (2026-07-24)
+
+### Bug Fixes
+
+* **babel-plugin-lingui-macro:** unwrap non-null assertion (`x!`) and `satisfies` in placeholders ([#2622](https://github.com/lingui/js-lingui/issues/2622)) ([d0479ad](https://github.com/lingui/js-lingui/commit/d0479adcc8cd1a5d4c00ae26633031002f400867))
+
+
+### Features
+
+* **babel-plugin-lingui-macro:** add nested `msg` and `t` support ([#2625](https://github.com/lingui/js-lingui/issues/2625)) ([eb1fbec](https://github.com/lingui/js-lingui/commit/eb1fbec3a5ddd80f1c37f459bd2bf30e1891e820))
+* **babel-plugin:** support Babel 8 via peer dependencies ([#2623](https://github.com/lingui/js-lingui/issues/2623)) ([c979f86](https://github.com/lingui/js-lingui/commit/c979f86d75c1bc1c221c40679162be260f65ed89))
+
+# [6.5.0](https://github.com/lingui/js-lingui/compare/v6.4.0...v6.5.0) (2026-07-06)
+
+**Note:** Version bump only for package @lingui/babel-plugin-lingui-macro
+
+# [6.4.0](https://github.com/lingui/js-lingui/compare/v6.3.0...v6.4.0) (2026-06-16)
+
+### Features
+
+* **macro:** set `/** i18n */` extraction mark instead of `/* i18n */` ([#2571](https://github.com/lingui/js-lingui/issues/2571)) ([57e3d4a](https://github.com/lingui/js-lingui/commit/57e3d4aef795bf5ab18eacb40da6eee56032a828))
+* solidjs integration ([#2510](https://github.com/lingui/js-lingui/issues/2510)) ([7aacbeb](https://github.com/lingui/js-lingui/commit/7aacbeba4ac0670dac4c2b90f41bd336e4fc2ac8))
+
+# [6.3.0](https://github.com/lingui/js-lingui/compare/v6.2.0...v6.3.0) (2026-06-10)
+
+**Note:** Version bump only for package @lingui/babel-plugin-lingui-macro
+
+# [6.2.0](https://github.com/lingui/js-lingui/compare/v6.1.0...v6.2.0) (2026-06-01)
+
+### Bug Fixes
+
+* provide peer deps for workspace build tools ([#2557](https://github.com/lingui/js-lingui/issues/2557)) ([dd11c28](https://github.com/lingui/js-lingui/commit/dd11c284501fd1ee2b435945a8d8a9af5eeef7cc))
+
+# [6.1.0](https://github.com/lingui/js-lingui/compare/v6.0.1...v6.1.0) (2026-05-21)
+
+### Features
+
+* add lingui-set/lingui-reset comment directives ([#2514](https://github.com/lingui/js-lingui/issues/2514)) ([96a52e8](https://github.com/lingui/js-lingui/commit/96a52e8323ff7d6de40a0067aa04c1270bc3370f))
+
+## [6.0.1](https://github.com/lingui/js-lingui/compare/v6.0.0...v6.0.1) (2026-04-30)
+
+**Note:** Version bump only for package @lingui/babel-plugin-lingui-macro
+
+# [6.0.0](https://github.com/lingui/js-lingui/compare/v5.9.5...v6.0.0) (2026-04-22)
+
+- [Announcing Lingui 6.0](https://lingui.dev/blog/2026/04/22/announcing-lingui-6.0)
+
+## [5.9.5](https://github.com/lingui/js-lingui/compare/v5.9.4...v5.9.5) (2026-04-06)
+
+**Note:** Version bump only for package @lingui/babel-plugin-lingui-macro
+
+## [5.9.4](https://github.com/lingui/js-lingui/compare/v5.9.3...v5.9.4) (2026-03-27)
+
+**Note:** Version bump only for package @lingui/babel-plugin-lingui-macro
+
+## [5.9.3](https://github.com/lingui/js-lingui/compare/v5.9.2...v5.9.3) (2026-03-13)
+
+**Note:** Version bump only for package @lingui/babel-plugin-lingui-macro
+
+## [5.9.2](https://github.com/lingui/js-lingui/compare/v5.9.1...v5.9.2) (2026-02-23)
+
+**Note:** Version bump only for package @lingui/babel-plugin-lingui-macro
+
+## [5.9.1](https://github.com/lingui/js-lingui/compare/v5.9.0...v5.9.1) (2026-02-11)
+
+### Bug Fixes
+
+* **macro:** Ignore JSX comments when generating message ids ([#2434](https://github.com/lingui/js-lingui/issues/2434)) ([c09deaa](https://github.com/lingui/js-lingui/commit/c09deaac19f2297a8c136cd98f1f3f76178891b0))
+
 # [5.9.0](https://github.com/lingui/js-lingui/compare/v5.8.0...v5.9.0) (2026-01-23)
 
 ### Bug Fixes

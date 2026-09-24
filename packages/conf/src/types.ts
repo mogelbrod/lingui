@@ -116,6 +116,45 @@ type CatalogService = {
   apiKey: string
 }
 
+/**
+ * Describes a single output chunk produced by the bundler.
+ */
+export type BundleChunk = {
+  /** Unique identifier for this chunk within the bundle (e.g. relative output path or fileName). */
+  id: string
+  /** Absolute or relative file path to the chunk on disk. */
+  filePath: string
+  /**
+   * If this chunk is an entry chunk, the absolute file path of the source entry point.
+   * Omit for shared/common chunks.
+   */
+  entryPoint?: string
+  /** IDs of other chunks that this chunk imports (references to other chunks' `id` fields). */
+  imports: string[]
+}
+
+/**
+ * Result returned by a bundler after bundling entry points.
+ *
+ * Bundlers describe the chunk graph — the CLI handles traversal
+ * to determine which entry points each shared chunk belongs to.
+ */
+export type BundleResult = {
+  chunks: BundleChunk[]
+}
+
+/**
+ * Pluggable bundler interface for the experimental extractor.
+ * Implementations bundle entry points and return a chunk graph.
+ */
+export type ExperimentalExtractorBundler = {
+  bundle(
+    entryPoints: string[],
+    outDir: string,
+    linguiConfig: LinguiConfigNormalized,
+  ): Promise<BundleResult>
+}
+
 export type ExperimentalExtractorOptions = {
   /**
    * Entries to start extracting from.
@@ -145,6 +184,7 @@ export type ExperimentalExtractorOptions = {
    * because they look like package imports.
    *
    * Add here the packages you want to include.
+   * @deprecated Use `bundler: createEsbuildBundler({ includeDeps: ... })` instead.
    */
   includeDeps?: string[]
 
@@ -154,6 +194,8 @@ export type ExperimentalExtractorOptions = {
    * is missing in this list please fill an issue on GitHub
    *
    * NOTE: changing this param will override default list of extensions.
+   *
+   * @deprecated Use `bundler: createEsbuildBundler({ excludeExtensions: ... })` instead.
    */
   excludeExtensions?: string[]
 
@@ -174,6 +216,26 @@ export type ExperimentalExtractorOptions = {
    */
   output: string
 
+  /**
+   * Pluggable bundler for the experimental extractor.
+   * If not provided, defaults to the built-in esbuild bundler.
+   *
+   * @example
+   * ```ts
+   * import { createEsbuildBundler } from "@lingui/cli/bundlers/esbuild"
+   *
+   * experimental: {
+   *   extractor: {
+   *     bundler: createEsbuildBundler({ resolveEsbuildOptions: (opts) => opts })
+   *   }
+   * }
+   * ```
+   */
+  bundler?: ExperimentalExtractorBundler
+
+  /**
+   * @deprecated Use `bundler: createEsbuildBundler({ resolveEsbuildOptions: ... })` instead.
+   */
   resolveEsbuildOptions?: (options: any) => any
 }
 
@@ -280,9 +342,34 @@ export type LinguiConfig = {
    * Locale used for pseudolocalization. For example, when you set `pseudoLocale: "en"`, all messages in the en catalog will be pseudo-localized.
    * The locale must be included in the locales config.
    *
+   * You can pass a single locale as a string (deprecated), an object to additionally
+   * configure the underlying [`pseudolocale`](https://github.com/MartinCerny-awin/pseudolocale)
+   * library (e.g. to customize the prepended/appended markers or extend the string length),
+   * or an array of objects to define multiple pseudolocales with different parameters.
+   *
+   * The string form is deprecated and will be removed in a future major release.
+   * Use the object form (`{ locale: "pseudo" }`) or array of objects instead.
+   *
+   * @example
+   *
+   * ```ts
+   * // Simple form (deprecated)
+   * pseudoLocale: "pseudo"
+   *
+   * // Extended form
+   * pseudoLocale: { locale: "pseudo", prepend: "⟦ ", append: " ⟧", extend: 0.4 }
+   *
+   * // Multiple pseudolocales
+   * pseudoLocale: [
+   *   { locale: "pseudo-en", prepend: "⟦ ", append: " ⟧" },
+   *   { locale: "pseudo-ar", rightToLeft: true }
+   * ]
+   * ```
+   *
    * https://lingui.dev/guides/pseudolocalization
    */
-  pseudoLocale?: string
+  pseudoLocale?:
+    DeprecatedPseudoLocaleString | PseudoLocaleConfig | PseudoLocaleConfig[]
   /**
    * This is the directory where the Lingui CLI scans for messages in your source files during the extraction process.
    *
@@ -307,8 +394,7 @@ export type LinguiConfig = {
    * ```
    */
   runtimeConfigModule?:
-    | ModuleSource
-    | Partial<Record<"useLingui" | "Trans" | "i18n", ModuleSource>>
+    ModuleSource | Partial<Record<"useLingui" | "Trans" | "i18n", ModuleSource>>
   /**
    * Specifies the default language of message IDs in your source files.
    *
@@ -351,7 +437,7 @@ export type LinguiConfig = {
      * // lingui.config
      * {
      *   macro: {
-     *     jsxPackage: ["@lingui/myMacro"];
+     *     jsxPackage: ["@lingui/myMacro"]
      *   }
      * }
      *
@@ -364,19 +450,151 @@ export type LinguiConfig = {
      * @default ["@lingui/react/macro"]
      */
     jsxPackage?: string[]
+    /**
+     * The JSX attribute name used to assign explicit placeholder names to JSX elements inside `<Trans>`.
+     *
+     * When set, the macro will read this attribute from JSX elements to use as the placeholder name
+     * in the message string, and strip the attribute from the output.
+     *
+     * ```tsx
+     * // lingui.config
+     * {
+     *   macro: {
+     *     jsxPlaceholderAttribute: "_t"
+     *   }
+     * }
+     *
+     * // source
+     * <Trans>Click <a _t="link" href="/">here</a></Trans>
+     *
+     * // extracted message: "Click <link>here</link>"
+     * ```
+     */
+    jsxPlaceholderAttribute?: string
+    /**
+     * A mapping of JSX element tag names to default placeholder names.
+     *
+     * When a JSX element inside `<Trans>` matches a key in this map and does not have an explicit
+     * placeholder attribute, the corresponding value is used as the placeholder name.
+     *
+     * ```tsx
+     * // lingui.config
+     * {
+     *   macro: {
+     *     jsxPlaceholderDefaults: { a: "link", em: "em" }
+     *   }
+     * }
+     *
+     * // source
+     * <Trans>Click <a href="/">here</a> and <em>this</em></Trans>
+     *
+     * // extracted message: "Click <link>here</link> and <em>this</em>"
+     * ```
+     */
+    jsxPlaceholderDefaults?: Record<string, string>
+    /**
+     * If defined, `idPrefix` will only be prepended to explicit IDs that
+     * start with this leader string. The leader string is kept in the final ID.
+     */
+    idPrefixLeader?: string
+    /**
+     * Controls which JSX runtime semantics the Lingui JSX macro emit.
+     *
+     * @default undefined
+     */
+    jsxRuntime?: "react" | "solid"
   }
   experimental?: {
     extractor?: ExperimentalExtractorOptions
   }
 }
 
+/**
+ * Subset of options accepted by the [`pseudolocale`](https://github.com/MartinCerny-awin/pseudolocale)
+ * library that Lingui exposes through the {@link LinguiConfig.pseudoLocale} config.
+ *
+ * The delimiter related options are intentionally omitted because Lingui relies
+ * on its own internal delimiter to protect HTML tags, ICU macros and variables.
+ */
+export type PseudoLocaleOptions = {
+  /**
+   * String prepended to the beginning of every pseudo-localized message.
+   *
+   * @default ""
+   */
+  prepend?: string
+  /**
+   * String appended to the end of every pseudo-localized message.
+   *
+   * @default ""
+   */
+  append?: string
+  /**
+   * Extends the width of the string by the given percentage (e.g. `0.3` adds 30%).
+   * Useful to emulate languages that are longer than the source, such as German.
+   *
+   * @default 0
+   */
+  extend?: number
+  /**
+   * Character used to pad pseudo-localized messages when `extend` is set.
+   *
+   * @default " "
+   */
+  extendCharacter?: string
+  /**
+   * Replaces every (non-token) character with the given one. Handy to quickly
+   * spot strings that were not extracted/translated.
+   *
+   * @default undefined
+   */
+  override?: string
+  /**
+   * Emulates right-to-left languages by inserting Unicode RTL override marks.
+   *
+   * @default false
+   */
+  rightToLeft?: boolean
+}
+
+/**
+ * Legacy string form of {@link LinguiConfig.pseudoLocale}, where the value is
+ * the pseudolocalization locale itself.
+ *
+ * @deprecated Use the object form ({@link PseudoLocaleConfig}, e.g. `{ locale: "pseudo" }`) instead.
+ * The string form will be removed in a future major release.
+ */
+export type DeprecatedPseudoLocaleString = string
+
+/**
+ * Extended form of {@link LinguiConfig.pseudoLocale}, allowing the
+ * pseudolocalization {@link PseudoLocaleOptions} to be configured alongside the locale.
+ */
+export type PseudoLocaleConfig = {
+  /**
+   * Locale used for pseudolocalization. The locale must be included in the `locales` config.
+   */
+  locale: string
+} & PseudoLocaleOptions
+
+/**
+ * Normalized form of {@link LinguiConfig.pseudoLocale}. `makeConfig` expands both
+ * the string and object forms into this shape so consumers always receive the
+ * locale and its {@link PseudoLocaleOptions} separately.
+ */
+export type PseudoLocaleConfigNormalized = {
+  locale: string
+  options: PseudoLocaleOptions
+}
+
 type ModuleSourceNormalized = readonly [module: string, specifier: string]
 
 export type LinguiConfigNormalized = Omit<
   LinguiConfig & typeof defaultConfig,
-  "runtimeConfigModule"
+  "runtimeConfigModule" | "pseudoLocale"
 > & {
   resolvedConfigPath?: string
+  pseudoLocale: PseudoLocaleConfigNormalized[]
   runtimeConfigModule: {
     i18n: ModuleSourceNormalized
     useLingui: ModuleSourceNormalized

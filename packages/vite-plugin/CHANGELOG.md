@@ -3,6 +3,78 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.8.0](https://github.com/lingui/js-lingui/compare/v6.7.0...v6.8.0) (2026-09-23)
+
+### Features
+
+* **cli:** add lingui check sync | missing commands ([#2515](https://github.com/lingui/js-lingui/issues/2515)) ([4cc6cdd](https://github.com/lingui/js-lingui/commit/4cc6cddcab739bf172924618aa7c3bf4cfffce6f))
+
+# [6.7.0](https://github.com/lingui/js-lingui/compare/v6.6.0...v6.7.0) (2026-09-11)
+
+### Features
+
+* **cli,conf:** add RTL pseudolocale and allow multiple pseudolocales ([#2652](https://github.com/lingui/js-lingui/issues/2652)) ([4c00dec](https://github.com/lingui/js-lingui/commit/4c00decb3dddbd9539725d093a5e68080c376668))
+
+# [6.6.0](https://github.com/lingui/js-lingui/compare/v6.5.0...v6.6.0) (2026-07-24)
+
+### Features
+
+* **babel-plugin:** support Babel 8 via peer dependencies ([#2623](https://github.com/lingui/js-lingui/issues/2623)) ([c979f86](https://github.com/lingui/js-lingui/commit/c979f86d75c1bc1c221c40679162be260f65ed89))
+
+# [6.5.0](https://github.com/lingui/js-lingui/compare/v6.4.0...v6.5.0) (2026-07-06)
+
+### Features
+
+* add pseudolocalize options ([#2583](https://github.com/lingui/js-lingui/issues/2583)) ([3547688](https://github.com/lingui/js-lingui/commit/35476887e8601b9a3dd0361c8c1a04ed2e8669a3))
+
+# [6.4.0](https://github.com/lingui/js-lingui/compare/v6.3.0...v6.4.0) (2026-06-16)
+
+**Note:** Version bump only for package @lingui/vite-plugin
+
+# [6.3.0](https://github.com/lingui/js-lingui/compare/v6.2.0...v6.3.0) (2026-06-10)
+
+**Note:** Version bump only for package @lingui/vite-plugin
+
+# [6.2.0](https://github.com/lingui/js-lingui/compare/v6.1.0...v6.2.0) (2026-06-01)
+
+### Bug Fixes
+
+* provide peer deps for workspace build tools ([#2557](https://github.com/lingui/js-lingui/issues/2557)) ([dd11c28](https://github.com/lingui/js-lingui/commit/dd11c284501fd1ee2b435945a8d8a9af5eeef7cc))
+
+# [6.1.0](https://github.com/lingui/js-lingui/compare/v6.0.1...v6.1.0) (2026-05-21)
+
+**Note:** Version bump only for package @lingui/vite-plugin
+
+## [6.0.1](https://github.com/lingui/js-lingui/compare/v6.0.0...v6.0.1) (2026-04-30)
+
+**Note:** Version bump only for package @lingui/vite-plugin
+
+# [6.0.0](https://github.com/lingui/js-lingui/compare/v5.9.5...v6.0.0) (2026-04-22)
+
+- [Announcing Lingui 6.0](https://lingui.dev/blog/2026/04/22/announcing-lingui-6.0)
+
+## [5.9.5](https://github.com/lingui/js-lingui/compare/v5.9.4...v5.9.5) (2026-04-06)
+
+**Note:** Version bump only for package @lingui/vite-plugin
+
+## [5.9.4](https://github.com/lingui/js-lingui/compare/v5.9.3...v5.9.4) (2026-03-27)
+
+**Note:** Version bump only for package @lingui/vite-plugin
+
+## [5.9.3](https://github.com/lingui/js-lingui/compare/v5.9.2...v5.9.3) (2026-03-13)
+
+### Bug Fixes
+
+* support vite 8 ([#2474](https://github.com/lingui/js-lingui/issues/2474)) ([e4468c7](https://github.com/lingui/js-lingui/commit/e4468c7cb01533e1f68e54c92e74a67cdfc1526d))
+
+## [5.9.2](https://github.com/lingui/js-lingui/compare/v5.9.1...v5.9.2) (2026-02-23)
+
+**Note:** Version bump only for package @lingui/vite-plugin
+
+## [5.9.1](https://github.com/lingui/js-lingui/compare/v5.9.0...v5.9.1) (2026-02-11)
+
+**Note:** Version bump only for package @lingui/vite-plugin
+
 # [5.9.0](https://github.com/lingui/js-lingui/compare/v5.8.0...v5.9.0) (2026-01-23)
 
 **Note:** Version bump only for package @lingui/vite-plugin

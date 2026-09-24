@@ -12,10 +12,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: "8.2"
           tools: composer
@@ -32,7 +32,7 @@ jobs:
           export-plural-rules --output=gettext-plurals.json json
 
       - name: Setup node
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
 
       - run: npx prettier --write packages/format-po-gettext/gettext-plurals.json
 
@@ -49,7 +49,7 @@ jobs:
 
       - name: Create Pull Request
         if: steps.diff.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           commit-message: "chore: update CLDR plural rules"
           title: "chore: update CLDR plural rules"

@@ -1,4 +1,5 @@
 import type {
+  DeprecatedPseudoLocaleString,
   FallbackLocales,
   LinguiConfig,
   LinguiConfigNormalized,
@@ -9,7 +10,11 @@ import { multipleValidOptions, validate } from "jest-validate"
 import { setCldrParentLocales } from "./migrations/setCldrParentLocales"
 import { pathJoinPosix } from "./utils/pathJoinPosix"
 import { normalizeRuntimeConfigModule } from "./migrations/normalizeRuntimeConfigModule"
-import { ExperimentalExtractorOptions } from "./types"
+import {
+  ExperimentalExtractorOptions,
+  PseudoLocaleConfig,
+  PseudoLocaleConfigNormalized,
+} from "./types"
 
 export function makeConfig(
   userConfig: Partial<LinguiConfig>,
@@ -46,8 +51,33 @@ export function makeConfig(
 
   return {
     ...out,
+    pseudoLocale: normalizePseudoLocale(config.pseudoLocale),
     resolvedConfigPath: opts.resolvedConfigPath,
   }
+}
+
+/**
+ * Expands the `pseudoLocale` config (a plain string, a {@link PseudoLocaleConfig}
+ * object, or an array of objects) into a normalized array shape with each locale
+ * and its options separated.
+ */
+function normalizePseudoLocale(
+  pseudoLocale: LinguiConfig["pseudoLocale"],
+): PseudoLocaleConfigNormalized[] {
+  if (!pseudoLocale) return []
+  const rawList = Array.isArray(pseudoLocale) ? pseudoLocale : [pseudoLocale]
+  return rawList
+    .map((item) => {
+      if (typeof item === "string") {
+        return item ? { locale: item, options: {} } : null
+      }
+      if (item?.locale) {
+        const { locale, ...options } = item
+        return { locale, options }
+      }
+      return null
+    })
+    .filter((item): item is NonNullable<typeof item> => !!item)
 }
 
 export const defaultConfig = {
@@ -69,7 +99,8 @@ export const defaultConfig = {
   fallbackLocales: {} as FallbackLocales,
   locales: [],
   orderBy: "message",
-  pseudoLocale: "",
+  pseudoLocale: "" as
+    DeprecatedPseudoLocaleString | PseudoLocaleConfig | PseudoLocaleConfig[],
   rootDir: ".",
   runtimeConfigModule: ["@lingui/core", "i18n"],
   macro: {
@@ -81,7 +112,39 @@ export const defaultConfig = {
 
 export const exampleConfig = {
   ...defaultConfig,
+  orderBy: multipleValidOptions("message", Function),
+  macro: {
+    ...defaultConfig.macro,
+    idPrefixLeader: ".",
+    jsxPlaceholderAttribute: "_t",
+    jsxPlaceholderDefaults: multipleValidOptions(
+      {},
+      { a: "link", em: "em", strong: "b" },
+    ),
+    jsxRuntime: multipleValidOptions("react", "solid"),
+  },
   format: multipleValidOptions({}, {}),
+  pseudoLocale: multipleValidOptions(
+    "",
+    {
+      locale: "",
+      prepend: "",
+      append: "",
+      extend: 0,
+      override: "",
+      rightToLeft: false,
+    },
+    [
+      {
+        locale: "",
+        prepend: "",
+        append: "",
+        extend: 0,
+        override: "",
+        rightToLeft: false,
+      },
+    ],
+  ),
   extractors: multipleValidOptions([], ["babel"], [Object]),
   runtimeConfigModule: multipleValidOptions(
     { i18n: ["@lingui/core", "i18n"], Trans: ["@lingui/react", "Trans"] },
@@ -109,6 +172,7 @@ export const exampleConfig = {
       excludeDeps: [],
       excludeExtensions: [],
       output: "",
+      bundler: multipleValidOptions({}, undefined),
       resolveEsbuildOptions: Function,
     },
   } as { extractor: ExperimentalExtractorOptions },
@@ -123,9 +187,9 @@ function deprecateParserOptions(config: LinguiConfig) {
   if (config.extractorParserOptions) {
     console.error(
       `\`extractorParserOptions\` config option is deprecated.
-      
+
 Please pass options directly to the extractor implementation:
-      
+
 import { createBabelExtractor } from '@lingui/cli/api/extractors/babel'
 
 export default {
@@ -141,9 +205,9 @@ function validateFormat(config: LinguiConfig) {
   if (typeof config.format === "string") {
     throw new Error(
       `String formats like \`{format: ${config.format}}\` are no longer supported.
-      
+
 Formatters must now be installed as separate packages and provided via format in lingui config:
-        
+
 import { formatter } from "@lingui/format-po"
 
 export default {

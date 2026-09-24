@@ -11,27 +11,32 @@ import {
 } from "@babel/types"
 import { JsMacroName, MsgDescriptorPropKey } from "./constants"
 import { ArgToken, TextToken, Token } from "./icu"
-import { createMessageDescriptorFromTokens } from "./messageDescriptorUtils"
+import {
+  createMessageDescriptorFromTokens,
+  ResolvedDescriptorFields,
+} from "./messageDescriptorUtils"
 import { makeCounter } from "./utils"
+import type { DirectiveValues } from "./linguiDirective"
 
 export type MacroJsContext = {
   // Positional expressions counter (e.g. for placeholders `Hello {0}, today is {1}`)
   getExpressionIndex: () => number
-  stripNonEssentialProps: boolean
-  stripMessageProp: boolean
+  descriptorFields: ResolvedDescriptorFields
   isLinguiIdentifier: (node: Identifier, macro: JsMacroName) => boolean
+  getDirective: (line: number) => DirectiveValues | undefined
+  idPrefixLeader?: string
 }
 
 export function createMacroJsContext(
   isLinguiIdentifier: MacroJsContext["isLinguiIdentifier"],
-  stripNonEssentialProps: boolean,
-  stripMessageProp: boolean,
+  descriptorFields: ResolvedDescriptorFields,
+  getDirective: MacroJsContext["getDirective"] = () => undefined,
 ): MacroJsContext {
   return {
-    getExpressionIndex: makeCounter(),
     isLinguiIdentifier,
-    stripNonEssentialProps,
-    stripMessageProp,
+    getExpressionIndex: makeCounter(),
+    descriptorFields,
+    getDirective,
   }
 }
 
@@ -84,15 +89,18 @@ export function processDescriptor(
       : tokenizeNode(messageValue, true, ctx)
   }
 
+  const directive = ctx.getDirective(descriptor.loc?.start.line) || {}
+
   return createMessageDescriptorFromTokens(
     tokens,
     descriptor.loc,
-    ctx.stripNonEssentialProps,
-    ctx.stripMessageProp,
+    ctx.descriptorFields,
     {
+      ...directive,
       id: idProperty,
-      context: contextProperty,
-      comment: commentProperty,
+      idPrefixLeader: ctx.idPrefixLeader,
+      context: contextProperty ?? directive?.context,
+      comment: commentProperty ?? directive?.comment,
     },
   )
 }
@@ -104,6 +112,11 @@ export function tokenizeNode(
 ): Token[] {
   if (isI18nMethod(node, ctx)) {
     // t
+    return tokenizeTemplateLiteral(node as Expression, ctx)
+  }
+
+  // msg`...` / defineMessage`...`
+  if (t.isTaggedTemplateExpression(node) && isDefineMessage(node.tag, ctx)) {
     return tokenizeTemplateLiteral(node as Expression, ctx)
   }
 
@@ -156,9 +169,10 @@ export function tokenizeTemplateLiteral(
     const currExp = expressions[i]
 
     if (currExp) {
-      argTokens = t.isCallExpression(currExp)
-        ? tokenizeNode(currExp, false, ctx)
-        : [tokenizeExpression(currExp, ctx)]
+      argTokens =
+        t.isCallExpression(currExp) || t.isTaggedTemplateExpression(currExp)
+          ? tokenizeNode(currExp, false, ctx)
+          : [tokenizeExpression(currExp, ctx)]
     }
     const textToken: TextToken = {
       type: "text",
@@ -210,6 +224,8 @@ export function tokenizeChoiceComponent(
         value = tokenizeTemplateLiteral(attrValue, ctx)
       } else if (t.isCallExpression(attrValue)) {
         value = tokenizeNode(attrValue, false, ctx)
+      } else if (t.isTaggedTemplateExpression(attrValue)) {
+        value = tokenizeNode(attrValue, false, ctx)
       } else if (t.isStringLiteral(attrValue)) {
         value = attrValue.value
       } else if (t.isExpression(attrValue)) {
@@ -254,7 +270,13 @@ export function tokenizeExpression(
   node: Node | Expression,
   ctx: MacroJsContext,
 ): ArgToken {
-  if (t.isTSAsExpression(node)) {
+  if (
+    t.isTSAsExpression(node) ||
+    t.isTSNonNullExpression(node) ||
+    t.isTSSatisfiesExpression(node)
+  ) {
+    // Unwrap TS-only expression wrappers (`x as T`, `x!`, `x satisfies T`) so the
+    // inner expression drives placeholder naming (e.g. `${x!}` → `{x}`, not `{0}`).
     return tokenizeExpression(node.expression, ctx)
   }
   if (t.isObjectExpression(node)) {

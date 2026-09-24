@@ -23,20 +23,19 @@ const config: Config = {
       disableSwitch: false,
       respectPrefersColorScheme: true,
     },
+    announcementBar: {
+      id: "lingui-6.0",
+      content: `✨ Lingui <strong>6.0</strong> is now available. <a href="/blog/2026/04/22/announcing-lingui-6.0">Read the release announcement</a> for what's new ✨`,
+      backgroundColor: "#0d9488",
+      textColor: "#ffffff",
+      isCloseable: true,
+    },
+    image: "img/og-image.png",
     metadata: [
-      {
-        name: "title",
-        content: "Lingui - Internationalization Framework for Global Products",
-      },
       {
         name: "description",
         content:
-          "Lingui is a modern internationalization framework for global products. It provides the best developer experience for managing translations and supports all major frameworks.",
-      },
-      {
-        name: "keywords",
-        content:
-          "internationalization, localization, multilingual, translation, i18n, l10n, react, react native, vue, next.js, ICU, javascript, typescript, pseudolocalization, internationalization framework",
+          "Lingui is a lightweight, open-source i18n library for JavaScript and TypeScript: compile-time macros and a CLI for React, React Native, Vue, SolidJS, Astro, Svelte and Node.js.",
       },
     ],
     navbar: {
@@ -76,7 +75,7 @@ const config: Config = {
           "aria-label": "GitHub repository",
         },
         {
-          href: "https://discord.gg/gFWwAYnMtA",
+          href: "https://discord.gg/hdNuF3rupQ",
           position: "right",
           className: "header-discord-link",
           title: "Discord",
@@ -144,11 +143,66 @@ const config: Config = {
     [
       "@signalwire/docusaurus-plugin-llms-txt",
       {
+        siteDescription:
+          "Lingui is a lightweight, open-source internationalization (i18n) library for JavaScript and TypeScript. It brings compile-time macros and a CLI for message extraction to React, React Native, Vue, SolidJS, Astro, Svelte, and Node.js.",
         content: {
           enableLlmsFullTxt: true,
-          excludeRoutes: ["/", "/search", "/community", "/misc/*", "/releases/*"],
+          relativePaths: false,
+          excludeRoutes: [
+            "/",
+            "/search",
+            "/community",
+            "/misc/resources",
+            "/misc/showroom",
+            "/misc/tooling",
+            "/releases/*",
+          ],
+          routeRules: [
+            { route: "/introduction", categoryName: "Introduction" },
+            { route: "/installation", categoryName: "Installation" },
+            { route: "/tutorials/**", categoryName: "Tutorials" },
+            { route: "/guides/**", categoryName: "Guides" },
+            { route: "/ref/**", categoryName: "API Reference" },
+            { route: "/examples", categoryName: "Examples" },
+            { route: "/tools/**", categoryName: "Sync & Collaboration Tools" },
+            { route: "/ai-tools", categoryName: "i18n with AI" },
+            { route: "/misc/**", categoryName: "Comparisons" },
+          ],
         },
-        includeOrder: ["/installation", "/tutorials/**", "/guides/**", "/ref/**", "/examples/**"],
+        includeOrder: [
+          "/introduction",
+          "/installation",
+          "/tutorials/**",
+          "/guides/**",
+          "/ref/**",
+          "/examples/**",
+          "/tools/**",
+          "/ai-tools/**",
+          "/misc/**",
+        ],
+        optionalLinks: [
+          {
+            title: "GitHub repository",
+            url: "https://github.com/lingui/js-lingui",
+            description: "Source code, issues and discussions",
+          },
+          {
+            title: "npm: @lingui/core",
+            url: "https://www.npmjs.com/package/@lingui/core",
+            description:
+              "The runtime package; @lingui/react adds the React bindings and @lingui/cli the command line tool",
+          },
+          {
+            title: "Agent Skills",
+            url: "https://github.com/lingui/skills",
+            description: "Lingui best practices packaged as Agent Skills for coding agents",
+          },
+          {
+            title: "Context7",
+            url: "https://context7.com/lingui/js-lingui",
+            description: "The current documentation served over MCP",
+          },
+        ],
       },
     ],
   ],

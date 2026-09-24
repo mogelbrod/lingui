@@ -1,3 +1,8 @@
+---
+title: Migration guide from 3.x to 4.x
+description: Upgrade Lingui from 3.x to 4.x. New extractor configuration, hash-based message IDs, the context feature, and the removed APIs to replace
+---
+
 # Migration guide from 3.x to 4.x
 
 ## Backward incompatible changes
@@ -9,7 +14,7 @@ Minimal required versions are:
 
 :::info
 
-If you encounter any difficulties during the migration process, don't hesitate to ask for assistance on the Lingui [Discord server](https://discord.gg/gFWwAYnMtA).
+If you encounter any difficulties during the migration process, don't hesitate to ask for assistance on the Lingui [Discord server](https://discord.gg/hdNuF3rupQ).
 
 :::
 

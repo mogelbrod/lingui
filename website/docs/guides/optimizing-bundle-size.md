@@ -1,3 +1,8 @@
+---
+title: Optimizing Bundle Size
+description: How Lingui keeps your bundle small by compiling messages to compact IDs and dropping the message compiler in production, and how to configure that behavior
+---
+
 # Keeping Your Bundle Small: How Lingui Optimizes for Performance
 
 When you're building a modern app with internationalization (i18n), it's easy to end up with a bloated bundle. The more languages and messages you have, the more it can grow — fast.
@@ -145,17 +150,19 @@ Here are a few ways to customize Lingui's behavior depending on your goals:
 
 ### 1. I want production to behave like development
 
-You want to keep original messages and use runtime compilation, even in production — maybe for debugging or dynamic catalogs.
+You want to keep original messages, context, and use runtime compilation, even in production — maybe for debugging or dynamic catalogs.
 
 **How to configure:**
 
 ```ts
 // Macro config
-stripMessageField: false;
+descriptorFields: "message";
 
 // Runtime setup
 i18n.setMessagesCompiler(compileMessage);
 ```
+
+This keeps `id`, `message`, and `context` in the output. The `context` is preserved because it is required for correct message ID generation.
 
 ### 2. I want full consistency between dev and prod
 
@@ -165,7 +172,7 @@ You want everything to be stripped in both environments. Useful for catching iss
 
 ```ts
 // Macro config
-stripMessageField: true;
+descriptorFields: "id-only";
 
 // Runtime setup
 i18n.setMessagesCompiler(null);
@@ -173,7 +180,7 @@ i18n.setMessagesCompiler(null);
 
 ### 3. I want to use default Lingui behavior
 
-You don't change anything. Lingui automatically strips messages in production and keeps them in development.
+You don't change anything. Lingui automatically strips messages in production (`descriptorFields: "auto"`) and keeps them in development.
 
 Just make sure to always run `extract-template` before building.
 

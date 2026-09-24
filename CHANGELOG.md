@@ -3,6 +3,154 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [6.8.0](https://github.com/lingui/js-lingui/compare/v6.7.0...v6.8.0) (2026-09-23)
+
+### Bug Fixes
+
+* **babel-plugin-lingui-macro:** restore `@babel/types` as a runtime dependency ([#2634](https://github.com/lingui/js-lingui/issues/2634)) ([db5f57c](https://github.com/lingui/js-lingui/commit/db5f57c8aa1f2895359ad74aee91791e74436d17))
+* **cli:** add translation as the last key of a new message ([#2677](https://github.com/lingui/js-lingui/issues/2677)) ([202a5f0](https://github.com/lingui/js-lingui/commit/202a5f053b23415810f7423d37b05f5e56b7bc21))
+* **cli:** export all types that are part of the public API ([#2668](https://github.com/lingui/js-lingui/issues/2668)) ([279de2d](https://github.com/lingui/js-lingui/commit/279de2dce6bebe3b02b0c8f117c309b272cb3eac))
+* **react:** substitute macro-accepted placeholder names in formatElements ([#2680](https://github.com/lingui/js-lingui/issues/2680)) ([74089ab](https://github.com/lingui/js-lingui/commit/74089ab0c305b1867fbd57c77377c7b093c5178c))
+
+### Features
+
+* **cli:** add lingui check sync | missing commands ([#2515](https://github.com/lingui/js-lingui/issues/2515)) ([4cc6cdd](https://github.com/lingui/js-lingui/commit/4cc6cddcab739bf172924618aa7c3bf4cfffce6f))
+
+### Reverts
+
+* "feat(cli): add support for `BatchExtractor` ([#2562](https://github.com/lingui/js-lingui/issues/2562))" ([#2673](https://github.com/lingui/js-lingui/issues/2673)) ([fd416f9](https://github.com/lingui/js-lingui/commit/fd416f9ef6b9cb49652873277f0ace111649bbfb))
+
+
+# [6.7.0](https://github.com/lingui/js-lingui/compare/v6.6.0...v6.7.0) (2026-09-11)
+
+### Bug Fixes
+
+* **core:** look up select choices and message ids as own properties ([#2664](https://github.com/lingui/js-lingui/issues/2664)) ([6dfa30d](https://github.com/lingui/js-lingui/commit/6dfa30d6888398b7de4ed5c46893d243045f497b))
+* **core:** prevent prototype pollution via __proto__ locale key in i18n.load ([#2658](https://github.com/lingui/js-lingui/issues/2658)) ([9b7986c](https://github.com/lingui/js-lingui/commit/9b7986c79b339b6127bb6fbdd3d132fadbbce89f))
+* make orderBy handling consistent ([#2665](https://github.com/lingui/js-lingui/issues/2665)) ([8cff1f0](https://github.com/lingui/js-lingui/commit/8cff1f0a820aad3d24f2c96780bb21e907b4f56a))
+
+### Features
+
+* **cli,conf:** add RTL pseudolocale and allow multiple pseudolocales ([#2652](https://github.com/lingui/js-lingui/issues/2652)) ([4c00dec](https://github.com/lingui/js-lingui/commit/4c00decb3dddbd9539725d093a5e68080c376668))
+* **conf:** support pseudolocale extend character ([#2651](https://github.com/lingui/js-lingui/issues/2651)) ([3f7f03d](https://github.com/lingui/js-lingui/commit/3f7f03d98445ed912ffeb9794b7bf9acc1d8d73d))
+
+
+# [6.6.0](https://github.com/lingui/js-lingui/compare/v6.5.0...v6.6.0) (2026-07-24)
+
+### Bug Fixes
+
+* **babel-plugin-lingui-macro:** unwrap non-null assertion (`x!`) and `satisfies` in placeholders ([#2622](https://github.com/lingui/js-lingui/issues/2622)) ([d0479ad](https://github.com/lingui/js-lingui/commit/d0479adcc8cd1a5d4c00ae26633031002f400867))
+* **cli:** preserve bracketed names in catalog globs ([#2621](https://github.com/lingui/js-lingui/issues/2621)) ([3c2f987](https://github.com/lingui/js-lingui/commit/3c2f9875c6bcd0d449a84946567c115d6b65e57a))
+* improved error message for "useLingui hook was used without I18nProvider" ([#2624](https://github.com/lingui/js-lingui/issues/2624)) ([bcee1df](https://github.com/lingui/js-lingui/commit/bcee1dfbb777be91ed5a8e47839d93dcde654abc))
+* **react:** use sync external store for i18n provider ([#2612](https://github.com/lingui/js-lingui/issues/2612)) ([b4be90d](https://github.com/lingui/js-lingui/commit/b4be90d31d40b2eb37552f3c1cea7b7345d734d7))
+
+### Features
+
+* **babel-plugin-lingui-macro:** add nested `msg` and `t` support ([#2625](https://github.com/lingui/js-lingui/issues/2625)) ([eb1fbec](https://github.com/lingui/js-lingui/commit/eb1fbec3a5ddd80f1c37f459bd2bf30e1891e820))
+* **babel-plugin:** support Babel 8 via peer dependencies ([#2623](https://github.com/lingui/js-lingui/issues/2623)) ([c979f86](https://github.com/lingui/js-lingui/commit/c979f86d75c1bc1c221c40679162be260f65ed89))
+
+
+# [6.5.0](https://github.com/lingui/js-lingui/compare/v6.4.0...v6.5.0) (2026-07-06)
+
+### Bug Fixes
+
+* don't warn about missing id when a spread is present ([#2581](https://github.com/lingui/js-lingui/issues/2581)) ([b1b9480](https://github.com/lingui/js-lingui/commit/b1b9480f7eb327e07819bd35c75d4e03a52e70ed))
+
+### Features
+
+* add pseudolocalize options ([#2583](https://github.com/lingui/js-lingui/issues/2583)) ([3547688](https://github.com/lingui/js-lingui/commit/35476887e8601b9a3dd0361c8c1a04ed2e8669a3))
+* **experimental-extractor:** pluggable bundler interface + rolldown support ([#2572](https://github.com/lingui/js-lingui/issues/2572)) ([06940ed](https://github.com/lingui/js-lingui/commit/06940ed09f5c2a70c96a5981121c77a4cd305b6c))
+
+# [6.4.0](https://github.com/lingui/js-lingui/compare/v6.3.0...v6.4.0) (2026-06-16)
+
+### Features
+
+* **macro:** set `/** i18n */` extraction mark instead of `/* i18n */` ([#2571](https://github.com/lingui/js-lingui/issues/2571)) ([57e3d4a](https://github.com/lingui/js-lingui/commit/57e3d4aef795bf5ab18eacb40da6eee56032a828))
+* solidjs integration ([#2510](https://github.com/lingui/js-lingui/issues/2510)) ([7aacbeb](https://github.com/lingui/js-lingui/commit/7aacbeba4ac0670dac4c2b90f41bd336e4fc2ac8))
+
+# [6.3.0](https://github.com/lingui/js-lingui/compare/v6.2.0...v6.3.0) (2026-06-10)
+
+### Bug Fixes
+
+* don't warn about idPrefixLeader in config ([#2561](https://github.com/lingui/js-lingui/issues/2561)) ([b2f5dc8](https://github.com/lingui/js-lingui/commit/b2f5dc8a02b54cb9da7730003f89eb0220463c47))
+* **po-format:** set default `foldLength` to 0 ([#2567](https://github.com/lingui/js-lingui/issues/2567)) ([087ff07](https://github.com/lingui/js-lingui/commit/087ff07f7df61b230303fe303189aebe5712d6d5))
+
+### Features
+
+* **cli:** add support for `BatchExtractor` ([#2562](https://github.com/lingui/js-lingui/issues/2562)) ([3d0bf56](https://github.com/lingui/js-lingui/commit/3d0bf56dd8da217485ed40e7f4d7c127213d66cb))
+
+# [6.2.0](https://github.com/lingui/js-lingui/compare/v6.1.0...v6.2.0) (2026-06-01)
+
+### Bug Fixes
+
+* provide peer deps for workspace build tools ([#2557](https://github.com/lingui/js-lingui/issues/2557)) ([dd11c28](https://github.com/lingui/js-lingui/commit/dd11c284501fd1ee2b435945a8d8a9af5eeef7cc))
+
+### Features
+
+* integrate `pofile-ts` ([#2548](https://github.com/lingui/js-lingui/issues/2548)) ([ea5b2d3](https://github.com/lingui/js-lingui/commit/ea5b2d33426560990d3ce49a97a58bdedf775cb9))
+* support typed message IDs ([#2503](https://github.com/lingui/js-lingui/issues/2503)) ([6b31d46](https://github.com/lingui/js-lingui/commit/6b31d4680a146232ccf96b628e77be4729e52933))
+
+### Performance Improvements
+
+* **cli:** speed up catalog merge key partitioning ([#2540](https://github.com/lingui/js-lingui/issues/2540)) ([c3f0aff](https://github.com/lingui/js-lingui/commit/c3f0aff0eba850c07fcd107879f30e9c00a4a8b5))
+
+# [6.1.0](https://github.com/lingui/js-lingui/compare/v6.0.1...v6.1.0) (2026-05-21)
+
+### Bug Fixes
+
+* disappearing placeholder comments in partial extract ([#2543](https://github.com/lingui/js-lingui/issues/2543)) ([725a2bf](https://github.com/lingui/js-lingui/commit/725a2bf4d0b0cbf5d405d6e9ed79efa391bdd572))
+
+### Features
+
+* add lingui-set/lingui-reset comment directives ([#2514](https://github.com/lingui/js-lingui/issues/2514)) ([96a52e8](https://github.com/lingui/js-lingui/commit/96a52e8323ff7d6de40a0067aa04c1270bc3370f))
+
+## [6.0.1](https://github.com/lingui/js-lingui/compare/v6.0.0...v6.0.1) (2026-04-30)
+
+### Bug Fixes
+
+* avoid throwing on object spreads in extractFromObjectExpression ([#2538](https://github.com/lingui/js-lingui/issues/2538)) ([7cbc0a8](https://github.com/lingui/js-lingui/commit/7cbc0a8638e1cc2f5ea702922b46156c0555fe29))
+* **cli:** declare files arguments ([#2532](https://github.com/lingui/js-lingui/issues/2532)) ([4a55abe](https://github.com/lingui/js-lingui/commit/4a55abe7b3d046b972cb26a3c5a11acf397f1d7a))
+
+## [6.0.0](https://github.com/lingui/js-lingui/compare/v5.9.5...v6.0.0) (2026-04-22)
+
+This release modernizes the codebase and packages (ESM-only distribution, smaller dependency graph, deprecated API removals, improved TypeScript support) and still ships meaningful new features and bug fixes.
+
+Check out the links below for more details:
+
+- [Blog Post: Announcing Lingui 6.0](https://lingui.dev/blog/2026/04/22/announcing-lingui-6.0)
+- [Migration Guide from 5.x to 6.x](https://lingui.dev/releases/migration-6)
+- [Full Changelog](https://github.com/lingui/js-lingui/compare/v5.9.5...v6.0.0)
+
+## [5.9.5](https://github.com/lingui/js-lingui/compare/v5.9.4...v5.9.5) (2026-04-06)
+
+### Bug Fixes
+
+* support braces in catalog pathname ([#2495](https://github.com/lingui/js-lingui/issues/2495)) ([db14681](https://github.com/lingui/js-lingui/commit/db14681e36ae1603499fafbd2dd00942ed1c2e0b))
+
+## [5.9.4](https://github.com/lingui/js-lingui/compare/v5.9.3...v5.9.4) (2026-03-27)
+
+### Bug Fixes
+
+* really keep catalog extra from previous catalog ([#2479](https://github.com/lingui/js-lingui/issues/2479)) ([c939113](https://github.com/lingui/js-lingui/commit/c939113293b29a948b80f2a6332cf8016c47ab37))
+
+## [5.9.3](https://github.com/lingui/js-lingui/compare/v5.9.2...v5.9.3) (2026-03-13)
+
+### Bug Fixes
+
+* support vite 8 ([#2474](https://github.com/lingui/js-lingui/issues/2474)) ([e4468c7](https://github.com/lingui/js-lingui/commit/e4468c7cb01533e1f68e54c92e74a67cdfc1526d))
+
+## [5.9.2](https://github.com/lingui/js-lingui/compare/v5.9.1...v5.9.2) (2026-02-23)
+
+### Bug Fixes
+
+* extract performance caused by catalog sort ([#2460](https://github.com/lingui/js-lingui/issues/2460)) ([f26a9d9](https://github.com/lingui/js-lingui/commit/f26a9d99a62db378b2a5895aaac3cab39558b568))
+
+## [5.9.1](https://github.com/lingui/js-lingui/compare/v5.9.0...v5.9.1) (2026-02-11)
+
+### Bug Fixes
+
+* **macro:** Ignore JSX comments when generating message ids ([#2434](https://github.com/lingui/js-lingui/issues/2434)) ([c09deaa](https://github.com/lingui/js-lingui/commit/c09deaac19f2297a8c136cd98f1f3f76178891b0))
+
 # [5.9.0](https://github.com/lingui/js-lingui/compare/v5.8.0...v5.9.0) (2026-01-23)
 
 ### Bug Fixes
